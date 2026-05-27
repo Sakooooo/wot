@@ -13,9 +13,11 @@ struct Cli {
 }
 
 fn main() {
+    env_logger::builder().format_timestamp(None).init();
+
     let cli = Cli::parse();
 
     match cli.command {
-        Commands::Init { directory } => todo!(),
+        Commands::Init { directory } => project::init(directory),
     };
 }
