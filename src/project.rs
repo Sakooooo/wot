@@ -37,7 +37,6 @@ pub fn init(directory: Option<String>) {
 
     if project_file.exists() {
         error!("A project already exists here!");
-        info!("hint: remove wot.toml");
         return;
     };
 
