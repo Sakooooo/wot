@@ -26,19 +26,24 @@ impl Default for Project {
 }
 
 pub fn init(directory: Option<String>) {
-    let target: Option<&Path> = if let Some(directory) = &directory {
-        Some(Path::new(directory))
+    let target: &Path = if let Some(directory) = &directory {
+        Path::new(directory)
     } else {
-        None
+        Path::new("./")
     };
 
-    let current_dir = {
-        let path = if let Some(target) = target {
-            target
-        } else {
-            Path::new("./")
+    if !target.exists() {
+        match std::fs::create_dir(&target) {
+            Ok(_) => info!("Creating directory {}", target.to_string_lossy()),
+            Err(e) => {
+                error!("Failed to create directory! {}", e);
+                return;
+            }
         };
-        match fs::read_dir(path) {
+    }
+
+    let current_dir = {
+        match fs::read_dir(target) {
             Ok(dir) => {
                 match dir
                     .map(|res| res.map(|e| e.path()))
@@ -69,6 +74,7 @@ pub fn init(directory: Option<String>) {
                 .expect("Unable to read user input.");
 
             if choice.trim().to_lowercase() == "y" {
+                info!("Continuing...");
             } else if choice.trim().to_lowercase() == "n" {
                 info!("Exiting...");
                 return;
@@ -78,20 +84,7 @@ pub fn init(directory: Option<String>) {
         }
     }
 
-    let project_file = if let Some(target) = target {
-        if !target.exists() {
-            match std::fs::create_dir(&target) {
-                Ok(_) => info!("Creating directory {}", target.to_string_lossy()),
-                Err(e) => {
-                    error!("Failed to create directory! {}", e);
-                    return;
-                }
-            };
-        }
-        target.join("wot.toml")
-    } else {
-        Path::new("wot.toml").to_path_buf()
-    };
+    let project_file = target.join("wot.toml");
 
     if project_file.exists() {
         error!("A project already exists here!");
@@ -105,6 +98,11 @@ pub fn init(directory: Option<String>) {
             error!("Failed to turn default values into wot.toml! {}", e);
             return;
         }
+    };
+
+    match PROJECT_TEMPLATE.extract(target) {
+        Ok(_) => info!("Copied template over!"),
+        Err(e) => error!("Failed to write template project files {}", e),
     };
 
     match std::fs::write(project_file, contents) {
