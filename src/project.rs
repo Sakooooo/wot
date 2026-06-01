@@ -1,3 +1,4 @@
+use include_dir::{include_dir, Dir};
 use std::{
     fs,
     io::{self, Read},
@@ -6,6 +7,8 @@ use std::{
 
 use log::{error, info, log, warn};
 use serde::{Deserialize, Serialize};
+
+const PROJECT_TEMPLATE: Dir<'_> = include_dir!("$CARGO_MANIFEST_DIR/project_template");
 
 #[derive(Serialize, Deserialize)]
 struct Project {
