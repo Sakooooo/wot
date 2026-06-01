@@ -109,3 +109,7 @@ pub fn init(directory: Option<String>) {
         Err(e) => error!("Failed to write project file {}", e),
     };
 }
+
+pub fn build() {
+    todo!();
+}

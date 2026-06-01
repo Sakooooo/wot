@@ -4,6 +4,7 @@ mod project;
 #[derive(Debug, Subcommand)]
 enum Commands {
     Init { directory: Option<String> },
+    Build,
 }
 
 #[derive(Debug, Parser)]
@@ -22,5 +23,6 @@ fn main() {
 
     match cli.command {
         Commands::Init { directory } => project::init(directory),
+        Commands::Build => project::build(),
     };
 }
